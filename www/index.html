@@ -1,6 +1,8 @@
 <!DOCTYPE html>
+
 <html>
   <head>
+    <meta http-equiv="Content-Security-Policy" content="default-src *; style-src 'self' 'unsafe-inline'; script-src 'self' 'unsafe-inline' 'unsafe-eval'">
     <meta charset="utf-8">
     <meta name="viewport" content="initial-scale=1, maximum-scale=1, user-scalable=no, width=device-width">
     <title></title>
@@ -20,14 +22,26 @@
 
     <!-- your app's js -->
     <script src="js/app.js"></script>
+    <script src="js/controllers/camera.js"></script>
+    <script src="js/services/camera.js"></script>
+
+
   </head>
   <body ng-app="Simplegram">
     <h2>Main content area</h2>
+    <p>hi</p>
+    <img style:"width:300px;height:300px;" id="myImage" src=""  />
     
-    <div class="bar bar-footer bar-balanced">
-      
-      <button class="button icon ion-camera"></button>
-      
+    <div class="bar bar-footer bar-balanced" ng-controller="CameraCtrl">
+
+      <div class="title" >
+        <button class="button button-icon icon ion-camera" ng-click="openCamera()"></button>
+      </div>
+
+      <div>
+        <button class="button button-icon ion-folder" ng-click="openMediaFile()"></button>
+      </div>
+
     </div>
 
     

@@ -1,1 +1,8 @@
 /* Empty. Add your own CSS if you like */
+.bar-footer {
+	min-height: 100px;
+}
+
+.button-icon, .button-icon:before {
+	font-size: 36px;
+}
