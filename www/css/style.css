@@ -1,8 +1,21 @@
 /* Empty. Add your own CSS if you like */
 .bar-footer {
-	min-height: 100px;
+	min-height: 50px;
 }
 
-.button-icon, .button-icon:before {
-	font-size: 36px;
+.button-icon {
+	font-size: 55px;
 }
+
+button.button-icon {
+	font-size: 55px;
+}
+
+.icon {
+	font-size: 55px;
+}
+
+/*div.photos img {
+	max-width: 85%;
+	max-height: 65%;
+}*/

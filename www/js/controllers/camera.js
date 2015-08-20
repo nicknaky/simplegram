@@ -1,14 +1,44 @@
-app.controller("CameraCtrl", function($scope) {
+app.controller("CameraCtrl", ["$scope", "FileService", "$window", "$ionicSideMenuDelegate", function($scope, FileService, $window, $ionicSideMenuDelegate) {
+
+	//Side menu section
+	$scope.toggleLeft = function() {
+		$ionicSideMenuDelegate.toggleLeft();
+	};
+
+	$scope.geoMode = {
+		checked: false
+	};
+
+	$scope.camChoice = {
+
+	};
+
+	function geoLocationSuccess(position) {
+		console.log("Latitude: " + position.coords.latitude);
+	}
+
+	$scope.printStatus = function() {
+		console.log($scope.geoMode.checked);
+		navigator.geolocation.getCurrentPosition(geolocationSuccess);
+
+	};
+
+
+
+	//Camera and photo files section
+
+	var imagesArray = [];
 
 	var destinationType, pictureSource;
 	var cameraOptions, imageOptions;
 
-	$scope.test = "test";
+	$scope.deviceHeight = (Math.floor($window.innerWidth * .85)) + "px";
+	$scope.deviceWidth = (Math.floor($window.innerWidth)) + "px";
+	$scope.half = Math.floor($window.innerWidth) / 2 * -1;
 
 	document.addEventListener("deviceready", onDeviceReady, false);
 
 	function onDeviceReady() {
-		console.log("cordova.file: " + cordova.file);
 		pictureSource = navigator.camera.PictureSourceType;
 		destinationType = navigator.camera.DestinationType;
 
@@ -16,88 +46,52 @@ app.controller("CameraCtrl", function($scope) {
 			quality: 75,
 			destinationType: destinationType.NATIVE_URI,
 			sourceType: pictureSource.CAMERA,
-			targetWidth: 300,
-			targetHeight: 300,
-			mediaType: Camera.MediaType.PICTURE
+			targetWidth: 640,
+			targetHeight: 640
 		};
 
 		imageOptions = {
 			quality: 75,
 			destinationType: destinationType.NATIVE_URI,
 			sourceType: pictureSource.PHOTOLIBRARY,
-			targetWidth: 300,
-			targetHeight: 300,
-			mediaType: Camera.MediaType.PICTURE
-		};
-
-		console.log(JSON.stringify(cameraOptions));
+			mediaType: Camera.MediaType.PICTURE,
+			targetWidth: 640,
+			targetHeight: 640
+		};	
 		console.log("Device Ready");
+		imagesArray = FileService.getRetrievedImages();
+		$scope.images = imagesArray;
 	}
 
+
 	$scope.openCamera = function() {
-		console.log("Opening camera");
 		navigator.camera.getPicture(cameraSuccess, cameraError, cameraOptions);
 	}; 
 
+	$scope.openMediaFile = function() {
+		navigator.camera.getPicture(cameraSuccess, cameraError, imageOptions);
+	};
+
 	function cameraSuccess(imageURI) {
 		console.log("Camera Success Callback");
-		var image = document.getElementById("myImage");
-		console.log("typeof(image): " + typeof(image));
-		console.log("image.tagName: " + image.tagName);
+		FileService.storeImage(imageURI);
+
+		var stringify = JSON.stringify(imageURI);
+		var parsed = JSON.parse(stringify);
+		console.log("imagesArray: " + imagesArray.length());
+		console.log("$scope.images: " + $scope.images.length());
 		console.log("imageURI: " + imageURI);
-		image.src = imageURI;
-		//$scope.imgURI = imageURI;
-		//console.log("$scope.imgURI: " + $scope.imgURI);
-		console.log("image.src: " + image.src);
+		console.log("parsed: " + parsed);
+		imagesArray.push(parsed);
+		console.log("log line 57: after imagesArray.push(parsed");
+		$scope.images = imagesArray;
 	}
-
-
 
 	function cameraError(error) {
 		alert("Failed because: " + message);
 	}
 
-	$scope.openMediaFile = function() {
-		console.log("Accessing media files");
-		navigator.camera.getPicture(cameraSuccess, cameraError, imageOptions);
-	};
-
-});
+}]);
 
 
 
-/*
-
-	$scope.openCamera = function() {
-		console.log("openCamera");
-		Camera.getPicture().then(function(imageURI) {
-			console.log(imageURI);
-			$scope.lastPhoto = imageURI;
-		}, function(err) {
-			console.err(err);
-		}, {
-			quality: 75,
-			targetWidth: 320,
-			targetHeight: 320,
-			saveToPhotoAlbum: false
-		});
-	};
-*/
-/*
-	$scope.openCamera = function() {
-		navigator.camera.getPicture(cameraSuccess, cameraError, cameraOptions);
-	};
-
-	function cameraSucess(imageData) {
-		var image = document.getElementById("myImage");
-		image.src = "data:image/jpeg;base64," + imageData;
-	}
-
-	function cameraError(message) {
-		alert("Failed because: " + message);
-	}
-
-	var cameraOptions = {
-
-	}
-*/
