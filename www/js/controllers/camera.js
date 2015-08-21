@@ -1,9 +1,25 @@
-app.controller("CameraCtrl", ["$scope", "FileService", "$window", "$ionicSideMenuDelegate", function($scope, FileService, $window, $ionicSideMenuDelegate) {
+angular
+	.module("Simplegram")
+	.controller("CameraCtrl", [	"$scope", 
+								"FileService", 
+								"$window", 
+								"$ionicSideMenuDelegate",
+								"MapService",
+								CameraCtrl]);
+
+
+function CameraCtrl($scope, FileService, $window, $ionicSideMenuDelegate, MapService) {
 
 	//Side menu section
 	$scope.toggleLeft = function() {
 		$ionicSideMenuDelegate.toggleLeft();
 	};
+
+	$scope.delete = function(uri) {
+		FileService.deleteImage(uri);
+		$scope.images = FileService.getLoadedImages();
+	};
+	
 
 	$scope.geoMode = {
 		checked: false
@@ -13,21 +29,23 @@ app.controller("CameraCtrl", ["$scope", "FileService", "$window", "$ionicSideMen
 
 	};
 
-	function geoLocationSuccess(position) {
-		console.log("Latitude: " + position.coords.latitude);
+
+	function geolocationError(error) {
+		console.log("geolocation error: " + error.message + "\n" + "code: " + error.code);
+		alert("geolocation error: " + error.message);
 	}
+
+	var geolocationOptions = {
+		enableHighAccuracy: true
+	};
 
 	$scope.printStatus = function() {
 		console.log($scope.geoMode.checked);
-		navigator.geolocation.getCurrentPosition(geolocationSuccess);
+		navigator.geolocation.getCurrentPosition(geolocationSuccess, geolocationError, geolocationOptions);
 
 	};
 
-
-
 	//Camera and photo files section
-
-	var imagesArray = [];
 
 	var destinationType, pictureSource;
 	var cameraOptions, imageOptions;
@@ -59,8 +77,9 @@ app.controller("CameraCtrl", ["$scope", "FileService", "$window", "$ionicSideMen
 			targetHeight: 640
 		};	
 		console.log("Device Ready");
-		imagesArray = FileService.getRetrievedImages();
-		$scope.images = imagesArray;
+		$scope.images = FileService.getLoadedImages();
+		console.log($scope.images);
+		$scope.$apply();
 	}
 
 
@@ -74,24 +93,32 @@ app.controller("CameraCtrl", ["$scope", "FileService", "$window", "$ionicSideMen
 
 	function cameraSuccess(imageURI) {
 		console.log("Camera Success Callback");
-		FileService.storeImage(imageURI);
+		var date = new Date();
 
-		var stringify = JSON.stringify(imageURI);
-		var parsed = JSON.parse(stringify);
-		console.log("imagesArray: " + imagesArray.length());
-		console.log("$scope.images: " + $scope.images.length());
-		console.log("imageURI: " + imageURI);
-		console.log("parsed: " + parsed);
-		imagesArray.push(parsed);
-		console.log("log line 57: after imagesArray.push(parsed");
-		$scope.images = imagesArray;
+		FileService.addImage(imageURI, date);
+		$scope.images = FileService.getLoadedImages();
+
+		navigator.geolocation.getCurrentPosition(geolocationSuccess, geolocationError, geolocationOptions);
+
+		function geolocationSuccess(position) {
+			console.log("Latitude: " + position.coords.latitude);
+
+			var localImage = {
+				uri: imageURI,
+				date: date,
+				geo: position,
+				location: null
+			}
+			MapService.callMapsAPI(localImage);
+		}
+
 	}
 
 	function cameraError(error) {
 		alert("Failed because: " + message);
 	}
 
-}]);
+}
 
 
 

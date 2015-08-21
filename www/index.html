@@ -2,7 +2,7 @@
 
 <html>
   <head>
-    <meta http-equiv="Content-Security-Policy" content="default-src *; style-src 'self' 'unsafe-inline'; script-src 'self' 'unsafe-inline' 'unsafe-eval'">
+    <meta http-equiv="Content-Security-Policy" content="default-src *; script-src 'self' 'unsafe-inline' 'unsafe-eval' *; style-src  'self' 'unsafe-inline' *">
 
     <meta charset="utf-8">
     <meta name="viewport" content="initial-scale=1, maximum-scale=1, user-scalable=no, width=device-width">
@@ -26,12 +26,12 @@
 
 
   </head>
-  <body >
+  <body ng-app="Simplegram" ng-controller="CameraCtrl">
     
     <ion-side-menus>
 
       
-      <ion-side-menu-content ng-controller="CameraCtrl">
+      <ion-side-menu-content>
         <ion-header-bar class="bar-dark">
           
             <button class="button button-icon button-clear ion-navicon" ng-click="toggleLeft()">
@@ -39,29 +39,48 @@
           
           <h1 class="title">Simplegram</h1>
         </ion-header-bar>
-        <ion-scroll direction="y" style=" width: 100%;
-                                          height: 100%;">
-          <div ng-repeat="image in images" 
+        <ion-content overflow-scroll="true">
+<!--         <ion-scroll direction="y" style=" width: 100%;
+                                          height: 100%;"> -->
+          <div ng-repeat="image in images track by image.uri" 
                     style=" width:100%;
                             height: {{deviceWidth}};
                             border: 1px solid black;
                             margin-top:25px;
                             position: relative;
                            ">
-                <div style="background-image: url({{image}});
+                <div style="background-image: url({{image.uri}});
                             background-repeat: no-repeat;
                             background-size: contain;
                             background-position: center;
                             position: absolute;
                             top: 50%;
                             left: 50%;
-                            height: 80%;
+                            height: 70%;
                             width: 80%;
                             margin: -40% 0 0 -40%;
                             " >
                 </div>
+                <div style="position: absolute;
+                            bottom: 0;
+                            display: table;
+                              ">
+                    <button class="button button-icon ion-trash-b" ng-click="delete(image.uri)"
+                      style="display: table-cell;
+                            font-size: 35px">
+                    </button>
+                    <div style="display: table-cell;
+                                width: 100%;
+                                ">
+                        <p>Date: {{image.date | date: "MMM d, yyyy"}}</p>
+                        <p>Location: {{image.location}}</p>
+                    </div>
+                    
+                </div>
+
             </div>
-          </ion-scroll>
+          </ion-content>
+<!--           </ion-scroll> -->
 
       </ion-side-menu-content>
 
@@ -71,8 +90,6 @@
         </ion-header-bar>
           <ion-content>
             <ion-list>
-
-                <ion-item>Test</ion-item>
                 <ion-item nav-close menu-close ng-click="openCamera()">Enter Camera Mode</ion-item>
                 <ion-item nav-close menu-close href="#/">Enter List Mode</ion-item>
                 <ion-item nav-close menu-close>Enter Grid Mode</ion-item>
@@ -88,9 +105,6 @@
         </ion-content>
       </ion-side-menu>
 
-
-    </ion-side-menus>
-
        <ion-footer-bar class="bar-dark">
         <div class="row">
           <div class="col col-center col-33 col-offset-33">
@@ -104,9 +118,14 @@
         </div>
       </ion-footer-bar>
 
+    </ion-side-menus>
+
+
+
     
     <script src="js/app.js"></script>
     <script src="js/controllers/camera.js"></script>
     <script src="js/services/FileService.js"></script>
+    <script src="js/services/maps.js"></script>
   </body>
 </html>
