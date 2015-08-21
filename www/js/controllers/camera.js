@@ -5,10 +5,12 @@ angular
 								"$window", 
 								"$ionicSideMenuDelegate",
 								"MapService",
+								"GeoService",
+								"SettingsService",
 								CameraCtrl]);
 
 
-function CameraCtrl($scope, FileService, $window, $ionicSideMenuDelegate, MapService) {
+function CameraCtrl($scope, FileService, $window, $ionicSideMenuDelegate, MapService, GeoService, SettingsService) {
 
 	//Side menu section
 	$scope.toggleLeft = function() {
@@ -20,23 +22,17 @@ function CameraCtrl($scope, FileService, $window, $ionicSideMenuDelegate, MapSer
 		$scope.images = FileService.getLoadedImages();
 	};
 	
+	$scope.geoMode = SettingsService.get("GEOMODE");
 
-	$scope.geoMode = {
-		checked: false
+	$scope.toggleGeoMode = function(isChecked) {
+		SettingsService.set("GEOMODE", isChecked);
+		console.log("GEOMODE is: " + isChecked);
 	};
+
+
 
 	$scope.camChoice = {
 
-	};
-
-
-	function geolocationError(error) {
-		console.log("geolocation error: " + error.message + "\n" + "code: " + error.code);
-		alert("geolocation error: " + error.message);
-	}
-
-	var geolocationOptions = {
-		enableHighAccuracy: true
 	};
 
 	$scope.printStatus = function() {
@@ -64,6 +60,7 @@ function CameraCtrl($scope, FileService, $window, $ionicSideMenuDelegate, MapSer
 			quality: 75,
 			destinationType: destinationType.NATIVE_URI,
 			sourceType: pictureSource.CAMERA,
+			allowEdit: false,
 			targetWidth: 640,
 			targetHeight: 640
 		};
@@ -94,23 +91,16 @@ function CameraCtrl($scope, FileService, $window, $ionicSideMenuDelegate, MapSer
 	function cameraSuccess(imageURI) {
 		console.log("Camera Success Callback");
 		var date = new Date();
+		var geo = null;
+		var location = null;
 
-		FileService.addImage(imageURI, date);
+		FileService.addImage(imageURI, date, geo, location);
 		$scope.images = FileService.getLoadedImages();
-
-		navigator.geolocation.getCurrentPosition(geolocationSuccess, geolocationError, geolocationOptions);
-
-		function geolocationSuccess(position) {
-			console.log("Latitude: " + position.coords.latitude);
-
-			var localImage = {
-				uri: imageURI,
-				date: date,
-				geo: position,
-				location: null
-			}
-			MapService.callMapsAPI(localImage);
+		console.log("geoMode: " + $scope.geoMode);
+		if ($scope.geoMode === "true"){
+			GeoService.getGeolocation(imageURI);	
 		}
+		$scope.$apply();
 
 	}
 
@@ -119,6 +109,10 @@ function CameraCtrl($scope, FileService, $window, $ionicSideMenuDelegate, MapSer
 	}
 
 }
+
+
+
+
 
 
 

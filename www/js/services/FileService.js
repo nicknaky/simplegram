@@ -34,13 +34,13 @@ function FileService() {
 		return images;
 	};
 
-	function addImage(imgURI, date) {
+	function addImage(imgURI, date, geo, location) {
 
 		var imageData = {
 			uri: imgURI,
 			date: date,
-			geo: null,
-			location: null
+			geo: geo,
+			location: location
 		};
 
 		console.log("FileService.js(46): " + imageData.uri.substring(imageData.uri.length, 8));

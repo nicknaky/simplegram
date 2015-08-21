@@ -24,8 +24,8 @@ function MapService($http, FileService) {
 			}
 		).then(function(response) {
 			console.log(response);
-			var city = response.data.results[0].address_components[3].long_name;
-			var state = response.data.results[0].address_components[5].short_name;
+			var city = response.data.results[0].address_components[2].long_name;
+			var state = response.data.results[0].address_components[4].short_name;
 			var location = city + ", " + state;
 			console.log("location: " + location);
 			FileService.updateImage(imageData.uri, imageData.date, imageData.geo, location);
